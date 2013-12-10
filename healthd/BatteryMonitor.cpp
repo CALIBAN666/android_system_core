@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <batteryservice/BatteryService.h>
-#include <cutils/klog.h>
+#include <cutils/log.h>
 #include <utils/String8.h>
 #include <utils/Vector.h>
 
@@ -64,7 +64,7 @@ int BatteryMonitor::getBatteryStatus(const char* status) {
 
     ret = mapSysfsString(status, batteryStatusMap);
     if (ret < 0) {
-        KLOG_WARNING(LOG_TAG, "Unknown battery status '%s'\n", status);
+        ALOGW("Unknown battery status '%s'\n", status);
         ret = BATTERY_STATUS_UNKNOWN;
     }
 
@@ -86,7 +86,7 @@ int BatteryMonitor::getBatteryHealth(const char* status) {
 
     ret = mapSysfsString(status, batteryHealthMap);
     if (ret < 0) {
-        KLOG_WARNING(LOG_TAG, "Unknown battery health '%s'\n", status);
+        ALOGW("Unknown battery health '%s'\n", status);
         ret = BATTERY_HEALTH_UNKNOWN;
     }
 
@@ -100,7 +100,7 @@ int BatteryMonitor::readFromFile(const String8& path, char* buf, size_t size) {
         return -1;
     int fd = open(path.string(), O_RDONLY, 0);
     if (fd == -1) {
-        KLOG_ERROR(LOG_TAG, "Could not open '%s'\n", path.string());
+        ALOGE("Could not open '%s'\n", path.string());
         return -1;
     }
 
@@ -284,7 +284,7 @@ bool BatteryMonitor::update(void) {
                     props.chargerDockAcOnline = mHealthdConfig->dockBatterySupported;
                     break;
                 default:
-                    KLOG_WARNING(LOG_TAG, "%s: Unknown power supply type\n",
+                    ALOGW("%s: Unknown power supply type\n",
                                  mChargerNames[i].string());
                 }
             }
@@ -329,7 +329,7 @@ bool BatteryMonitor::update(void) {
             strlcat(dockdmesgline, b, sizeof(dockdmesgline));
         }
 
-        KLOG_INFO(LOG_TAG, "%s%s chg=%s%s%s%s\n", dmesgline, dockdmesgline,
+        ALOGI("%s%s chg=%s%s%s%s\n", dmesgline, dockdmesgline,
                   props.chargerAcOnline ? "a" : "",
                   props.chargerDockAcOnline ? "d" : "",
                   props.chargerUsbOnline ? "u" : "",
@@ -349,7 +349,7 @@ void BatteryMonitor::init(struct healthd_config *hc, bool nosvcmgr) {
     mHealthdConfig = hc;
     DIR* dir = opendir(POWER_SUPPLY_SYSFS_PATH);
     if (dir == NULL) {
-        KLOG_ERROR(LOG_TAG, "Could not open %s\n", POWER_SUPPLY_SYSFS_PATH);
+        ALOGE("Could not open %s\n", POWER_SUPPLY_SYSFS_PATH);
     } else {
         struct dirent* entry;
 
@@ -562,38 +562,37 @@ void BatteryMonitor::init(struct healthd_config *hc, bool nosvcmgr) {
     }
 
     if (!mChargerNames.size())
-        KLOG_ERROR(LOG_TAG, "No charger supplies found\n");
-
+        ALOGE("No charger supplies found\n");
     if (mHealthdConfig->batteryStatusPath.isEmpty())
-        KLOG_WARNING(LOG_TAG, "BatteryStatusPath not found\n");
+        ALOGW("BatteryStatusPath not found\n");
     if (mHealthdConfig->batteryHealthPath.isEmpty())
-        KLOG_WARNING(LOG_TAG, "BatteryHealthPath not found\n");
+        ALOGW("BatteryHealthPath not found\n");
     if (mHealthdConfig->batteryPresentPath.isEmpty())
-        KLOG_WARNING(LOG_TAG, "BatteryPresentPath not found\n");
+        ALOGW("BatteryPresentPath not found\n");
     if (mHealthdConfig->batteryCapacityPath.isEmpty())
-        KLOG_WARNING(LOG_TAG, "BatteryCapacityPath not found\n");
+        ALOGW("BatteryCapacityPath not found\n");
     if (mHealthdConfig->batteryVoltagePath.isEmpty())
-        KLOG_WARNING(LOG_TAG, "BatteryVoltagePath not found\n");
+        ALOGW("BatteryVoltagePath not found\n");
     if (mHealthdConfig->batteryTemperaturePath.isEmpty())
-        KLOG_WARNING(LOG_TAG, "BatteryTemperaturePath not found\n");
+        ALOGW("BatteryTemperaturePath not found\n");
     if (mHealthdConfig->batteryTechnologyPath.isEmpty())
-        KLOG_WARNING(LOG_TAG, "BatteryTechnologyPath not found\n");
+        ALOGW("BatteryTechnologyPath not found\n");
 
     if (mHealthdConfig->dockBatterySupported) {
         if (mHealthdConfig->dockBatteryStatusPath.isEmpty())
-            KLOG_WARNING(LOG_TAG, "DockBatteryStatusPath not found\n");
+            ALOGW("DockBatteryStatusPath not found\n");
         if (mHealthdConfig->dockBatteryHealthPath.isEmpty())
-            KLOG_WARNING(LOG_TAG, "DockBatteryHealthPath not found\n");
+            ALOGW("DockBatteryHealthPath not found\n");
         if (mHealthdConfig->dockBatteryPresentPath.isEmpty())
-            KLOG_WARNING(LOG_TAG, "DockBatteryPresentPath not found\n");
+            ALOGW("DockBatteryPresentPath not found\n");
         if (mHealthdConfig->dockBatteryCapacityPath.isEmpty())
-            KLOG_WARNING(LOG_TAG, "DockBatteryCapacityPath not found\n");
+            ALOGW("DockBatteryCapacityPath not found\n");
         if (mHealthdConfig->dockBatteryVoltagePath.isEmpty())
-            KLOG_WARNING(LOG_TAG, "DockBatteryVoltagePath not found\n");
+            ALOGW("DockBatteryVoltagePath not found\n");
         if (mHealthdConfig->dockBatteryTemperaturePath.isEmpty())
-            KLOG_WARNING(LOG_TAG, "DockBatteryTemperaturePath not found\n");
+            ALOGW("DockBatteryTemperaturePath not found\n");
         if (mHealthdConfig->dockBatteryTechnologyPath.isEmpty())
-            KLOG_WARNING(LOG_TAG, "DockBatteryTechnologyPath not found\n");
+            ALOGW("DockBatteryTechnologyPath not found\n");
     }
 
     if (nosvcmgr == false) {
